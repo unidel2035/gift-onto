@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gift-onto · чат-агент в матрице дара</title>
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --line:#262b36; --me:#7aa2f7; --you:#9ece6a; --dim:#5c6370; --fg:#c8ccd4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--fg); }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); }
+  header b { color:#fff; } header span { color:var(--dim); }
+  .wrap { display:flex; height:calc(100vh - 53px); }
+  .chat { flex:1; display:flex; flex-direction:column; }
+  #log { flex:1; overflow:auto; padding:18px; }
+  .msg { margin:0 0 14px; max-width:80%; }
+  .msg .who { font-size:12px; color:var(--dim); margin-bottom:2px; }
+  .you { margin-left:auto; text-align:right; }
+  .you .bubble { background:#1d2630; }
+  .me .bubble { background:var(--panel); }
+  .bubble { display:inline-block; padding:9px 13px; border-radius:12px; border:1px solid var(--line); white-space:pre-wrap; }
+  .gift { font-size:12px; color:var(--dim); margin-top:4px; }
+  form { display:flex; gap:8px; padding:14px; border-top:1px solid var(--line); }
+  input { flex:1; background:var(--panel); border:1px solid var(--line); color:var(--fg); padding:11px 13px; border-radius:10px; font:inherit; }
+  button { background:var(--me); color:#0b0d10; border:0; padding:0 18px; border-radius:10px; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  aside { width:300px; border-left:1px solid var(--line); padding:18px; overflow:auto; }
+  aside h3 { margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); }
+  .thread { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .thread b { color:var(--me); font-variant-numeric:tabular-nums; }
+  .note { color:var(--dim); font-size:12px; margin-top:16px; }
+  a { color:var(--me); }
+</style>
+</head>
+<body>
+<header><b>gift-onto</b> · <span>чат-агент как лицо в матрице дара (DeepSeek). Каждый обмен — необратимый акт.</span></header>
+<div class="wrap">
+  <div class="chat">
+    <div id="log"></div>
+    <form id="f">
+      <input id="i" placeholder="Подари вопрос…" autocomplete="off" autofocus>
+      <button id="b">Дать</button>
+    </form>
+  </div>
+  <aside>
+    <h3>Матрица W</h3>
+    <div id="threads"><div class="note">пока пусто — задай вопрос</div></div>
+    <div class="note">Нить = накопленный вес даров между лицами. Асимметрия (кто кому дал больше) — это и есть доверие.
+      <br><br>Подробнее: <a href="https://github.com/unidel2035/gift-onto" target="_blank">gift-onto</a></div>
+  </aside>
+</div>
+<script>
+const log = document.getElementById('log'), threadsEl = document.getElementById('threads');
+const f = document.getElementById('f'), i = document.getElementById('i'), b = document.getElementById('b');
+const YOU = 'Дионисий';
+
+function bubble(cls, who, text, gift) {
+  const d = document.createElement('div'); d.className = 'msg ' + cls;
+  d.innerHTML = `<div class="who">${who}</div><div class="bubble"></div>` + (gift ? `<div class="gift">${gift}</div>` : '');
+  d.querySelector('.bubble').textContent = text;
+  log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+}
+function renderThreads(threads) {
+  threadsEl.innerHTML = threads.length
+    ? threads.map(t => `<div class="thread"><span>${t.k}</span><b>${t.w.toFixed(1)}</b></div>`).join('')
+    : '<div class="note">пока пусто</div>';
+}
+
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = i.value.trim(); if (!message) return;
+  i.value = ''; b.disabled = true;
+  bubble('you', YOU, message, 'дар: question (вес 3, необратим)');
+  const thinking = bubble('me', '…', 'думает');
+  try {
+    const r = await fetch('/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message, you: YOU }) });
+    const data = await r.json();
+    thinking.remove();
+    if (data.error) { bubble('me', 'ошибка', data.error); }
+    else {
+      bubble('me', data.me, data.reply, `дар: ${data.type} (вес ${data.weight}, необратим)`);
+      renderThreads(data.threads);
+    }
+  } catch (err) { thinking.remove(); bubble('me', 'ошибка', String(err)); }
+  b.disabled = false; i.focus();
+});
+
+fetch('/matrix').then(r => r.json()).then(d => renderThreads(d.threads)).catch(() => {});
+</script>
+</body>
+</html>

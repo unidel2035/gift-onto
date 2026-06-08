@@ -89,8 +89,13 @@ Full treatment: **[docs/COMPARISON.md](docs/COMPARISON.md)**.
 [`demo/agent-chat.mjs`](demo/agent-chat.mjs) is a chat agent on **DeepSeek** that is a *person in the gift matrix*: every exchange is an irreversible act, trust accumulates, and the agent reflects on the asymmetry of the relationship — reasoning about reciprocity, not just facts. ~130 lines; swap in any OpenAI-compatible model. See [`demo/README.md`](demo/README.md).
 
 ```bash
-export DEEPSEEK_API_KEY=sk-... && npm i openai && node demo/agent-chat.mjs
+export DEEPSEEK_API_KEY=sk-...
+cd demo && npm install
+npm start          # web: deploy the matrix → http://localhost:8099 (chat + live W)
+npm run chat       # or CLI
 ```
+
+The matrix is persisted append-only and replayed on restart — the relationship survives reboots, as irreversibility demands.
 
 ## The formal vocabulary
 

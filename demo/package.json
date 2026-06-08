@@ -1,0 +1,16 @@
+{
+  "name": "gift-onto-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deployable demo: an AI agent (DeepSeek) as a person in the gift matrix — CLI and web.",
+  "scripts": {
+    "start": "node server.mjs",
+    "serve": "node server.mjs",
+    "chat": "node agent-chat.mjs",
+    "smoke": "node agent-chat.mjs --script"
+  },
+  "dependencies": {
+    "openai": "^4.0.0"
+  }
+}

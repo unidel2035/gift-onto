@@ -9,13 +9,35 @@ Every exchange becomes an irreversible `GiftAct`:
 - both acts are frozen and appended to matrix **W**; weights accumulate (the ontology axiom: `time` heavier than `money`);
 - the agent **sees** the matrix in its system prompt and reflects on the asymmetry of the thread.
 
-## Run it
+## Two ways to run
 
 ```bash
 export DEEPSEEK_API_KEY=sk-...        # OpenAI-compatible, api.deepseek.com
-npm i openai
-node demo/agent-chat.mjs              # interactive  (/w matrix · /trust · /exit)
-node demo/agent-chat.mjs --script     # scripted smoke test, no stdin
+cd demo && npm install               # installs openai
+```
+
+**Web — deploy the matrix as a live service:**
+
+```bash
+npm start                            # → http://localhost:8099
+```
+
+Open the browser: chat on the left, the matrix W growing live on the right. The matrix is **persisted** to an append-only `.matrix.jsonl` (never rewritten) and **replayed on restart** — the relationship survives reboots, as irreversibility demands. DeepSeek runs server-side; the API key never reaches the browser.
+
+API: `POST /chat {message}` · `GET /matrix` · `GET /trust?from=&to=`
+
+**CLI:**
+
+```bash
+npm run chat                         # interactive  (/w matrix · /trust · /exit)
+npm run smoke                        # scripted smoke test, no stdin
+```
+
+### Deploy it for real
+
+```bash
+PORT=80 AGENT_NAME=Серафим node server.mjs        # or behind nginx / pm2
+pm2 start server.mjs --name gift-matrix
 ```
 
 ## Sample run (`--script`)
