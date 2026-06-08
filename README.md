@@ -84,6 +84,14 @@ Full treatment: **[docs/COMPARISON.md](docs/COMPARISON.md)**.
 
 ---
 
+## See it move — an AI agent in the matrix
+
+[`demo/agent-chat.mjs`](demo/agent-chat.mjs) is a chat agent on **DeepSeek** that is a *person in the gift matrix*: every exchange is an irreversible act, trust accumulates, and the agent reflects on the asymmetry of the relationship — reasoning about reciprocity, not just facts. ~130 lines; swap in any OpenAI-compatible model. See [`demo/README.md`](demo/README.md).
+
+```bash
+export DEEPSEEK_API_KEY=sk-... && npm i openai && node demo/agent-chat.mjs
+```
+
 ## The formal vocabulary
 
 The machine-readable ontology lives in **[`ontology/gift.ttl`](ontology/gift.ttl)** — OWL 2 / Turtle, 8 classes, 16 properties, aligned to W3C **PROV-O** (`gift:GiftAct ⊑ prov:Activity`, `gift:Person ⊑ prov:Agent`). The five axioms are encoded as OWL restrictions; load it in Protégé or any reasoner. See [`ontology/README.md`](ontology/README.md). This is the artifact that makes `gift-onto` an ontology in the same sense as REA or PROV-O — the `src/` tree is its reference implementation, the `docs/` its prose, the `specs/` its DSL.
