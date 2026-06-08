@@ -29,8 +29,11 @@ const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8099;
 const ME = process.env.AGENT_NAME || 'Серафим';
 
-if (!process.env.DEEPSEEK_API_KEY) { console.error('Нужен DEEPSEEK_API_KEY в окружении.'); process.exit(1); }
-const client = new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com' });
+// Key resolution (BYOK): a per-request key wins; else the server's env key.
+// If neither exists, /chat asks the user for their own key. The server
+// never logs or persists a user-supplied key — it is used and discarded.
+const SERVER_KEY = process.env.DEEPSEEK_API_KEY || null;
+const clientFor = (key) => new OpenAI({ apiKey: key, baseURL: 'https://api.deepseek.com' });
 const matrix = new Matrix(path.join(DIR, '.matrix.jsonl'));   // persisted, append-only
 
 const json = (res, code, obj) => { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -44,7 +47,8 @@ const server = http.createServer(async (req, res) => {
       return res.end(fs.readFileSync(path.join(DIR, 'public', 'index.html')));
     }
     if (req.method === 'GET' && url.pathname === '/matrix') {
-      return json(res, 200, { threads: matrix.threads(), acts: matrix.log.length });
+      // byok=true tells the UI it must collect the user's own key
+      return json(res, 200, { threads: matrix.threads(), acts: matrix.log.length, byok: !SERVER_KEY });
     }
     if (req.method === 'GET' && url.pathname === '/trust') {
       const [from, to] = [url.searchParams.get('from'), url.searchParams.get('to')];
@@ -53,7 +57,9 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/chat') {
       const { message, you = 'Дионисий' } = JSON.parse(await body(req) || '{}');
       if (!message) return json(res, 400, { error: 'message required' });
-      const { reply, act } = await askAgent(client, matrix, you, ME, message);
+      const key = req.headers['x-deepseek-key'] || SERVER_KEY;   // BYOK: user's key wins
+      if (!key) return json(res, 401, { error: 'need-key', message: 'Введите свой ключ DeepSeek (api.deepseek.com).' });
+      const { reply, act } = await askAgent(clientFor(key), matrix, you, ME, message);
       return json(res, 200, { reply, type: act.type, weight: act.weight, me: ME, you, threads: matrix.threads() });
     }
     json(res, 404, { error: 'not found' });
@@ -62,4 +68,4 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => console.log(`gift matrix развёрнута → http://localhost:${PORT}  (агент: ${ME}, актов в логе: ${matrix.log.length})`));
+server.listen(PORT, () => console.log(`gift matrix развёрнута → http://localhost:${PORT}  (агент: ${ME}, ключ: ${SERVER_KEY ? 'серверный' : 'BYOK — каждый свой'}, актов в логе: ${matrix.log.length})`));

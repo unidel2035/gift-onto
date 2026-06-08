@@ -34,6 +34,12 @@
 </head>
 <body>
 <header><b>gift-onto</b> · <span>чат-агент как лицо в матрице дара (DeepSeek). Каждый обмен — необратимый акт.</span></header>
+<div id="keybar" style="display:none;padding:10px 18px;background:#1d2630;border-bottom:1px solid var(--line);font-size:13px">
+  <span style="color:var(--dim)">Свой ключ DeepSeek (<a href="https://platform.deepseek.com" target="_blank">получить</a>) — хранится только в этом браузере, шлётся напрямую агенту, на сервере не сохраняется:</span>
+  <input id="key" type="password" placeholder="sk-..." style="margin:0 6px;width:200px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg)">
+  <button id="savekey" type="button" style="height:30px;padding:0 12px">Сохранить</button>
+  <span id="keyok" style="color:var(--you);margin-left:8px"></span>
+</div>
 <div class="wrap">
   <div class="chat">
     <div id="log"></div>
@@ -52,7 +58,21 @@
 <script>
 const log = document.getElementById('log'), threadsEl = document.getElementById('threads');
 const f = document.getElementById('f'), i = document.getElementById('i'), b = document.getElementById('b');
+const keybar = document.getElementById('keybar'), keyIn = document.getElementById('key');
 const YOU = 'Дионисий';
+
+// BYOK — the user's own DeepSeek key, kept only in this browser
+const KEY = 'gift_deepseek_key';
+keyIn.value = localStorage.getItem(KEY) || '';
+document.getElementById('savekey').addEventListener('click', () => {
+  localStorage.setItem(KEY, keyIn.value.trim());
+  document.getElementById('keyok').textContent = '✓ сохранён';
+  setTimeout(() => document.getElementById('keyok').textContent = '', 2000);
+});
+function authHeaders() {
+  const k = localStorage.getItem(KEY);
+  return k ? { 'content-type': 'application/json', 'x-deepseek-key': k } : { 'content-type': 'application/json' };
+}
 
 function bubble(cls, who, text, gift) {
   const d = document.createElement('div'); d.className = 'msg ' + cls;
@@ -73,10 +93,11 @@ f.addEventListener('submit', async (e) => {
   bubble('you', YOU, message, 'дар: question (вес 3, необратим)');
   const thinking = bubble('me', '…', 'думает');
   try {
-    const r = await fetch('/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message, you: YOU }) });
+    const r = await fetch('/chat', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ message, you: YOU }) });
     const data = await r.json();
     thinking.remove();
-    if (data.error) { bubble('me', 'ошибка', data.error); }
+    if (data.error === 'need-key') { keybar.style.display = 'block'; bubble('me', 'нужен ключ', data.message); keyIn.focus(); }
+    else if (data.error) { bubble('me', 'ошибка', data.error); }
     else {
       bubble('me', data.me, data.reply, `дар: ${data.type} (вес ${data.weight}, необратим)`);
       renderThreads(data.threads);
@@ -85,7 +106,10 @@ f.addEventListener('submit', async (e) => {
   b.disabled = false; i.focus();
 });
 
-fetch('/matrix').then(r => r.json()).then(d => renderThreads(d.threads)).catch(() => {});
+fetch('/matrix').then(r => r.json()).then(d => {
+  renderThreads(d.threads);
+  if (d.byok) keybar.style.display = 'block';   // server has no key → user brings own
+}).catch(() => {});
 </script>
 </body>
 </html>
