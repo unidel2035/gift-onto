@@ -50,6 +50,9 @@ const server = http.createServer(async (req, res) => {
       // byok=true tells the UI it must collect the user's own key
       return json(res, 200, { threads: matrix.threads(), acts: matrix.log.length, byok: !SERVER_KEY });
     }
+    if (req.method === 'GET' && url.pathname === '/metrics') {
+      return json(res, 200, matrix.metrics());   // energy, conductivity, asymmetry, deserts
+    }
     if (req.method === 'GET' && url.pathname === '/trust') {
       const [from, to] = [url.searchParams.get('from'), url.searchParams.get('to')];
       return json(res, 200, { from, to, trust: matrix.trust(from, to) });

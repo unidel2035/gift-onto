@@ -51,12 +51,17 @@
   <aside>
     <h3>Матрица W</h3>
     <div id="threads"><div class="note">пока пусто — задай вопрос</div></div>
-    <div class="note">Нить = накопленный вес даров между лицами. Асимметрия (кто кому дал больше) — это и есть доверие.
-      <br><br>Подробнее: <a href="https://github.com/unidel2035/gift-onto" target="_blank">gift-onto</a></div>
+    <h3 style="margin-top:22px">Энергия лиц</h3>
+    <div id="energy"><div class="note">дал − принял</div></div>
+    <h3 style="margin-top:22px">Пустыни</h3>
+    <div id="deserts"><div class="note">пары без нити — молчание, что задаёт вопрос</div></div>
+    <div class="note">Нить = вес даров между лицами. Энергия = дал − принял. Пустыня = ещё не было ни одного дара.
+      <br><br><a href="https://github.com/unidel2035/gift-onto/blob/main/docs/METRICS.md" target="_blank">о метриках</a> · <a href="https://github.com/unidel2035/gift-onto" target="_blank">gift-onto</a></div>
   </aside>
 </div>
 <script>
 const log = document.getElementById('log'), threadsEl = document.getElementById('threads');
+const energyEl = document.getElementById('energy'), desertsEl = document.getElementById('deserts');
 const f = document.getElementById('f'), i = document.getElementById('i'), b = document.getElementById('b');
 const keybar = document.getElementById('keybar'), keyIn = document.getElementById('key');
 const YOU = 'Дионисий';
@@ -85,6 +90,15 @@ function renderThreads(threads) {
     ? threads.map(t => `<div class="thread"><span>${t.k}</span><b>${t.w.toFixed(1)}</b></div>`).join('')
     : '<div class="note">пока пусто</div>';
 }
+function renderMetrics(m) {
+  energyEl.innerHTML = m.persons.length
+    ? m.persons.map(p => `<div class="thread"><span>${p.id}</span><b style="color:${p.energy>=0?'var(--you)':'#e0a36a'}">${p.energy>=0?'+':''}${p.energy.toFixed(1)}</b></div>`).join('')
+    : '<div class="note">дал − принял</div>';
+  desertsEl.innerHTML = m.deserts.length
+    ? m.deserts.slice(0,6).map(d => `<div class="thread" style="color:var(--dim)"><span>${d.from}→${d.to}</span><b style="color:var(--dim)">∅</b></div>`).join('')
+    : '<div class="note">пустынь нет</div>';
+}
+const refreshMetrics = () => fetch('/metrics').then(r=>r.json()).then(renderMetrics).catch(()=>{});
 
 f.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -101,6 +115,7 @@ f.addEventListener('submit', async (e) => {
     else {
       bubble('me', data.me, data.reply, `дар: ${data.type} (вес ${data.weight}, необратим)`);
       renderThreads(data.threads);
+      refreshMetrics();
     }
   } catch (err) { thinking.remove(); bubble('me', 'ошибка', String(err)); }
   b.disabled = false; i.focus();
@@ -110,6 +125,7 @@ fetch('/matrix').then(r => r.json()).then(d => {
   renderThreads(d.threads);
   if (d.byok) keybar.style.display = 'block';   // server has no key → user brings own
 }).catch(() => {});
+refreshMetrics();
 </script>
 </body>
 </html>
