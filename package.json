@@ -1,7 +1,7 @@
 {
   "name": "gift-onto",
   "version": "0.1.0",
-  "description": "The ontology of the gift — a directed, asymmetric, irreversible act between persons, with surplus. The substrate beneath event and transaction ontologies.",
+  "description": "A persistent trust fabric for multi-agent AI — an irreversible, asymmetric matrix of gifts between agents, where trust accumulates, credit is assigned, and deception is a measurable pathology. Grounded in the ontology of the gift (OWL/PROV-O).",
   "type": "module",
   "main": "src/index.js",
   "exports": {
@@ -21,17 +21,21 @@
     "LICENSE"
   ],
   "keywords": [
+    "multi-agent",
+    "agents",
+    "ai-agents",
+    "trust",
+    "agent-society",
+    "multi-agent-systems",
+    "credit-assignment",
+    "theory-of-mind",
+    "alignment",
+    "reputation",
     "ontology",
-    "gift",
     "gift-economy",
     "irreversibility",
-    "trust",
-    "reciprocity",
-    "anamnesis",
-    "event-sourcing",
-    "multi-agent",
-    "rea",
-    "provenance"
+    "provenance",
+    "owl"
   ],
   "license": "MIT",
   "optionalDependencies": {
