@@ -1,0 +1,172 @@
+@prefix gift: <https://github.com/unidel2035/gift-onto/ns#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+#################################################################
+#  gift-onto — the ontology of the gift  (OWL 2)
+#
+#  A formal vocabulary for the gift act: a directed, asymmetric,
+#  irreversible transfer of value between persons, with surplus.
+#  Aligned to W3C PROV-O to make the comparison in docs/COMPARISON.md
+#  concrete: gift extends provenance with weight, irreversibility,
+#  and asymmetry-of-value.
+#################################################################
+
+<https://github.com/unidel2035/gift-onto/ns> a owl:Ontology ;
+    dct:title "The ontology of the gift" ;
+    dct:license <https://opensource.org/licenses/MIT> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:comment "Primitive: the gift act. Neighbouring ontologies are degenerate cases — see docs/COMPARISON.md. transaction = gift + mandatory counter-act + rollback; event = gift − direction − weight − person." .
+
+#################################################################
+#  Classes
+#################################################################
+
+gift:Person a owl:Class ;
+    rdfs:subClassOf prov:Agent ;
+    rdfs:label "Person" ;
+    rdfs:comment "An irreducible locus of acts: human, agent, institution, sourceless origin (_abyss) or the commons (_koinon). Never decomposed into attributes — the unit of moral reality. (ousia is unknowable; a person is known by their acts.)" .
+
+gift:GiftAct a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "GiftAct" ;
+    rdfs:comment "The atom. A directed, weighted, frozen transfer from one Person to another. Completes at the moment of giving; acceptance is the recipient's freedom, not a completion condition." ;
+    # AXIOM 1 (irreversibility): every GiftAct is irreversible.
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty gift:irreversible ; owl:hasValue true ] ;
+    # AXIOM 3 (personhood): exactly one giver and one recipient, both Persons.
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty gift:hasGiver ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass gift:Person ] ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty gift:hasRecipient ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass gift:Person ] .
+
+gift:Thread a owl:Class ;
+    rdfs:label "Thread" ;
+    rdfs:comment "A directed edge of the matrix W: the accumulated weight of gift acts from one Person to another. W[A][B] is independent of W[B][A] — asymmetry is first-class." .
+
+gift:Surplus a owl:Class ;
+    rdfs:label "Surplus" ;
+    rdfs:comment "AXIOM 4 (non-conservation): the remainder when the result of a gift exceeds its input. The ontology does not conserve." .
+
+gift:Proof a owl:Class ;
+    rdfs:label "Proof" ;
+    rdfs:comment "External witness of an act: a git commit, a message, an issue, or time." .
+
+gift:Telos a owl:Class ;
+    rdfs:label "Telos" ;
+    rdfs:comment "What an act is for. An act whose telos does not serve the recipient fails TelosCheck." .
+
+gift:Logos a owl:Class ;
+    rdfs:label "Logos" ;
+    rdfs:comment "The principle/reason of a being (after Maximus the Confessor): why it is, what it is for. Borne by persons, gifts and creation." .
+
+gift:GiftType a owl:Class ;
+    rdfs:label "GiftType" ;
+    owl:oneOf ( gift:time gift:presence gift:knowledge gift:code gift:word
+                gift:money gift:data gift:memory gift:question gift:offering gift:grace ) .
+
+#################################################################
+#  Object properties
+#################################################################
+
+gift:hasGiver a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:Person ;
+    rdfs:subPropertyOf prov:wasAssociatedWith ;
+    rdfs:label "hasGiver" .
+
+gift:hasRecipient a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:Person ;
+    rdfs:label "hasRecipient" .
+
+# AXIOM 2 (asymmetry of value): the giving relation between persons is
+# asymmetric and irreflexive — giving is not the same as receiving.
+gift:gave a owl:ObjectProperty , owl:AsymmetricProperty , owl:IrreflexiveProperty ;
+    rdfs:domain gift:Person ; rdfs:range gift:Person ;
+    rdfs:label "gave" ;
+    rdfs:comment "Derived: A gave to B (there exists a GiftAct with hasGiver A and hasRecipient B)." .
+
+gift:succeeds a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:GiftAct ;
+    rdfs:subPropertyOf prov:wasInformedBy ;
+    rdfs:label "succeeds" ;
+    rdfs:comment "Anamnesis chain: this act follows (and re-presents) prior acts. Append-only; the chain is never rewritten." .
+
+gift:produces a owl:ObjectProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:Surplus ; rdfs:label "produces" .
+
+gift:along a owl:ObjectProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:Thread ; rdfs:label "along" .
+
+gift:hasProof a owl:ObjectProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:Proof ; rdfs:label "hasProof" .
+
+gift:hasTelos a owl:ObjectProperty ;
+    rdfs:range gift:Telos ; rdfs:label "hasTelos" .
+
+gift:threadFrom a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:Thread ; rdfs:range gift:Person ; rdfs:label "threadFrom" .
+
+gift:threadTo a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:Thread ; rdfs:range gift:Person ; rdfs:label "threadTo" .
+
+#################################################################
+#  Datatype properties
+#################################################################
+
+gift:irreversible a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range xsd:boolean ;
+    rdfs:label "irreversible" ;
+    rdfs:comment "Always true (AXIOM 1)." .
+
+gift:weight a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ;
+    rdfs:label "weight" ;
+    rdfs:comment "Moral/relational magnitude. Default by type (time=10 > money=3): ethics as weight, not rules (AXIOM 2)." ;
+    rdfs:range [ a rdfs:Datatype ;
+        owl:onDatatype xsd:decimal ;
+        owl:withRestrictions ( [ xsd:minInclusive "0.1"^^xsd:decimal ]
+                               [ xsd:maxInclusive "10.0"^^xsd:decimal ] ) ] .
+
+gift:weightOf a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:Thread ; rdfs:range xsd:decimal ;
+    rdfs:label "weightOf" ;
+    rdfs:comment "Accumulated weight of the thread (an edge of matrix W)." .
+
+gift:giftType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range gift:GiftType ; rdfs:label "giftType" .
+
+gift:content a owl:DatatypeProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range xsd:string ; rdfs:label "content" .
+
+gift:timestamp a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain gift:GiftAct ; rdfs:range xsd:dateTime ; rdfs:label "timestamp" .
+
+#################################################################
+#  Named individuals
+#################################################################
+
+gift:_abyss a owl:NamedIndividual , gift:Person ;
+    rdfs:label "_abyss" ;
+    rdfs:comment "The sourceless giver: acts arrive without an attributable origin (gratia gratis data)." .
+
+gift:_koinon a owl:NamedIndividual , gift:Person ;
+    rdfs:label "_koinon" ;
+    rdfs:comment "The commons: the shared recipient of acts given to all rather than to an individual." .
+
+#################################################################
+#  Notes on what OWL cannot express (kept here for honesty)
+#
+#  - trust(A→B) = Σ(positive) − 3 × Σ(manipulations) is a computed
+#    function over the act log, expressed in SPARQL / code, not OWL.
+#  - The reduction theorem (transaction = gift + counter-act + rollback)
+#    is a meta-claim about ontologies, stated in docs/COMPARISON.md.
+#  - Value constraints beyond datatype ranges (e.g. cross-act rules)
+#    belong in a SHACL shapes graph (ontology/gift.shacl.ttl — TODO).
+#################################################################

@@ -84,6 +84,10 @@ Full treatment: **[docs/COMPARISON.md](docs/COMPARISON.md)**.
 
 ---
 
+## The formal vocabulary
+
+The machine-readable ontology lives in **[`ontology/gift.ttl`](ontology/gift.ttl)** — OWL 2 / Turtle, 8 classes, 16 properties, aligned to W3C **PROV-O** (`gift:GiftAct ⊑ prov:Activity`, `gift:Person ⊑ prov:Agent`). The five axioms are encoded as OWL restrictions; load it in Protégé or any reasoner. See [`ontology/README.md`](ontology/README.md). This is the artifact that makes `gift-onto` an ontology in the same sense as REA or PROV-O — the `src/` tree is its reference implementation, the `docs/` its prose, the `specs/` its DSL.
+
 ## Documentation
 
 - **[docs/ONTOLOGY.md](docs/ONTOLOGY.md)** — the ontology in full: primitives, axioms, the matrix W, anamnesis, surplus.
