@@ -1,5 +1,7 @@
 # gift-onto — a persistent trust fabric for multi-agent AI
 
+[![ci](https://github.com/unidel2035/gift-onto/actions/workflows/ci.yml/badge.svg)](https://github.com/unidel2035/gift-onto/actions/workflows/ci.yml) · [watch a recorded society (no setup)](demo/society.sample.md)
+
 > The social substrate agents are missing: an **irreversible, asymmetric ledger of who-gave-what-to-whom**, where trust accumulates between runs, credit is assigned from the record, and deception is a *measurable pathology of the matrix* — not an intention you have to infer.
 
 Multi-agent frameworks — AutoGen, CrewAI, LangGraph — give agents a way to **talk** (messages), **act** (tools), and **remember** (a vector store). None gives them a **society**: a durable fabric of *relationships* that persists between episodes and lets an agent answer *"who has earned my trust, and what do I owe?"*
