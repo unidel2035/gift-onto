@@ -33,6 +33,15 @@ npm run chat                         # interactive  (/w matrix · /trust · /exi
 npm run smoke                        # scripted smoke test, no stdin
 ```
 
+**Society — several agents in one matrix** (see [../docs/AGENTS.md](../docs/AGENTS.md)):
+
+```bash
+node society.mjs                     # 3 DeepSeek agents give to each other; emergent trust
+node society.mjs 5                   # N rounds
+```
+
+Each agent (Кооператор / Стратег / Юродивый) reads the shared matrix and decides its own gift — no orchestration script. When the rounds end it prints the emergent society: energy, asymmetry, Shapley-like credit, and the deserts that never got a gift.
+
 ### Deploy it for real
 
 ```bash

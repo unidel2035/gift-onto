@@ -8,6 +8,20 @@
 
 ---
 
+## For AI agents — a society, not just an ontology
+
+Multi-agent frameworks (AutoGen, CrewAI, LangGraph) give agents a way to **talk, act, and remember**. They don't give them a **society**: a persistent, irreversible fabric of *relationships* that survives between runs and lets an agent ask "who has earned my trust, and what do I owe?" That fabric is the gift matrix `W`.
+
+`gift-onto` is the substrate where AI agents form social relations — give and receive, accumulate trust, get credit for collective outcomes, model each other, learn by imitation, and where **deception shows up as a measurable pathology of the matrix, not an intention you must infer.** The `src/social/` layer already implements the canonical multi-agent problems over `W`: credit assignment (Shapley-like), theory of mind, imitation learning, emergent norms, an adversarial agent, and a no-reset social environment.
+
+> An LLM is a stateless function. An agent with tools has hands. An agent **in a gift matrix** is a *person in a society* — with an irreversible history with every other agent.
+
+See **[docs/AGENTS.md](docs/AGENTS.md)**, and run a society of agents:
+
+```bash
+cd demo && npm install && node society.mjs    # several DeepSeek agents, one matrix, emergent trust
+```
+
 ## The one question it answers
 
 > *How does a system remember relationships in a way that lets it accumulate trust?*
@@ -105,6 +119,7 @@ The machine-readable ontology lives in **[`ontology/gift.ttl`](ontology/gift.ttl
 
 - **[docs/ONTOLOGY.md](docs/ONTOLOGY.md)** — the ontology in full: primitives, axioms, the matrix W, anamnesis, surplus.
 - **[docs/COMPARISON.md](docs/COMPARISON.md)** — gift vs every neighbouring ontology, with the formal reduction *transaction = gift + mandatory counter-act + rollback*.
+- **[docs/AGENTS.md](docs/AGENTS.md)** — gift-onto as the social substrate for AI agent societies: each `src/social/` module mapped to a multi-agent problem (credit assignment, theory of mind, imitation, deception, emergent norms), and the alignment angle.
 - **[docs/METRICS.md](docs/METRICS.md)** — the computations a gift matrix can have that a neutral graph cannot: energy, conductivity, asymmetry, deserts, trust, theosis. Live in the demo at `GET /metrics`.
 - **[docs/WHY.md](docs/WHY.md)** — why this had to be built: the four-property gap and the trust problem for AI agents.
 - **[docs/FOUNDATION.ru.md](docs/FOUNDATION.ru.md)** — the conceptual source, unabridged (Russian). `gift-onto` is *theologically motivated*; you don't need to share the frame to use it, and we don't hide it.
