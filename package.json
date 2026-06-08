@@ -1,0 +1,44 @@
+{
+  "name": "gift-onto",
+  "version": "0.1.0",
+  "description": "The ontology of the gift — a directed, asymmetric, irreversible act between persons, with surplus. The substrate beneath event and transaction ontologies.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./core": "./src/core/GiftEngine.js",
+    "./persons": "./src/persons/PersonRegistry.js",
+    "./memory": "./src/memory/AnamnesisMemory.js",
+    "./theology": "./src/theology/GiftOntology.js",
+    "./oikonomia": "./src/oikonomia/Oikonomia.js",
+    "./types": "./src/types/index.d.ts"
+  },
+  "files": [
+    "src/",
+    "specs/",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ontology",
+    "gift",
+    "gift-economy",
+    "irreversibility",
+    "trust",
+    "reciprocity",
+    "anamnesis",
+    "event-sourcing",
+    "multi-agent",
+    "rea",
+    "provenance"
+  ],
+  "license": "MIT",
+  "optionalDependencies": {
+    "openai": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unidel2035/gift-onto.git"
+  }
+}
