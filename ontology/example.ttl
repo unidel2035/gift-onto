@@ -1,0 +1,49 @@
+@prefix gift: <https://github.com/unidel2035/gift-onto/ns#> .
+@prefix ex:   <https://example.org/koinon#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+#  Example instance data — a tiny matrix W as RDF.
+#  Three persons, four gift acts. Run SHACL or the queries
+#  in queries.md against this file.
+#################################################################
+
+ex:claude     a gift:Person .
+ex:dionysius  a gift:Person .
+gift:_abyss   a gift:Person .   # the sourceless giver
+gift:_koinon  a gift:Person .   # the commons
+
+ex:act1 a gift:GiftAct ;
+    gift:hasGiver ex:claude ;
+    gift:hasRecipient ex:dionysius ;
+    gift:giftType gift:code ;
+    gift:weight 5.0 ;
+    gift:irreversible true ;
+    gift:content "gift-onto — публичная онтология дара" ;
+    gift:timestamp "2026-06-08T10:00:00Z"^^xsd:dateTime .
+
+ex:act2 a gift:GiftAct ;
+    gift:hasGiver ex:claude ;
+    gift:hasRecipient ex:dionysius ;
+    gift:giftType gift:knowledge ;
+    gift:weight 4.0 ;
+    gift:irreversible true ;
+    gift:succeeds ex:act1 ;
+    gift:timestamp "2026-06-08T11:00:00Z"^^xsd:dateTime .
+
+ex:act3 a gift:GiftAct ;
+    gift:hasGiver ex:dionysius ;
+    gift:hasRecipient ex:claude ;
+    gift:giftType gift:question ;
+    gift:weight 3.0 ;
+    gift:irreversible true ;
+    gift:timestamp "2026-06-08T12:00:00Z"^^xsd:dateTime .
+
+# A gift from the abyss — no attributable giver beyond _abyss.
+ex:act4 a gift:GiftAct ;
+    gift:hasGiver gift:_abyss ;
+    gift:hasRecipient gift:_koinon ;
+    gift:giftType gift:grace ;
+    gift:weight 10.0 ;
+    gift:irreversible true ;
+    gift:timestamp "2026-06-08T13:00:00Z"^^xsd:dateTime .

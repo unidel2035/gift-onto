@@ -1,0 +1,57 @@
+@prefix gift: <https://github.com/unidel2035/gift-onto/ns#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+#  SHACL shapes for gift-onto — the constraints OWL cannot hold.
+#  Validate instance data:  pyshacl -s gift.shacl.ttl example.ttl
+#################################################################
+
+gift:GiftActShape a sh:NodeShape ;
+    sh:targetClass gift:GiftAct ;
+
+    # AXIOM 3 — personhood: exactly one giver, exactly one recipient.
+    sh:property [
+        sh:path gift:hasGiver ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "A gift act must have exactly one giver (a Person IRI)." ] ;
+    sh:property [
+        sh:path gift:hasRecipient ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "A gift act must have exactly one recipient (a Person IRI)." ] ;
+
+    # AXIOM 1 — irreversibility: present and always true.
+    sh:property [
+        sh:path gift:irreversible ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:hasValue true ;
+        sh:message "A gift act is irreversible: the value must be true." ] ;
+
+    # AXIOM 2 — asymmetry of value: weight is bounded [0.1, 10.0].
+    sh:property [
+        sh:path gift:weight ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 10.0 ;
+        sh:message "Weight, if present, must be a decimal in [0.1, 10.0]." ] ;
+
+    # Type drawn from the closed vocabulary.
+    sh:property [
+        sh:path gift:giftType ;
+        sh:maxCount 1 ;
+        sh:in ( gift:time gift:presence gift:knowledge gift:code gift:word
+                gift:money gift:data gift:memory gift:question gift:offering gift:grace ) ;
+        sh:message "giftType must be one of the 11 defined kinds." ] ;
+
+    sh:property [
+        sh:path gift:timestamp ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:dateTime ] .
+
+# A Person whose only role is to receive is still a Person; no extra
+# constraints — personhood is irreducible, not validated by attributes.
+gift:PersonShape a sh:NodeShape ;
+    sh:targetClass gift:Person ;
+    sh:nodeKind sh:IRI .

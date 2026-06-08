@@ -1,0 +1,19 @@
+{
+  "@context": {
+    "gift": "https://github.com/unidel2035/gift-onto/ns#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd":  "http://www.w3.org/2001/XMLSchema#",
+
+    "GiftAct":  "gift:GiftAct",
+    "Person":   "gift:Person",
+
+    "from":         { "@id": "gift:hasGiver",    "@type": "@id" },
+    "to":           { "@id": "gift:hasRecipient", "@type": "@id" },
+    "type":         { "@id": "gift:giftType",     "@type": "@id" },
+    "weight":       { "@id": "gift:weight",       "@type": "xsd:decimal" },
+    "content":      { "@id": "gift:content",      "@type": "xsd:string" },
+    "irreversible": { "@id": "gift:irreversible", "@type": "xsd:boolean" },
+    "timestamp":    { "@id": "gift:timestamp",    "@type": "xsd:dateTime" },
+    "succeeds":     { "@id": "gift:succeeds",     "@type": "@id" }
+  }
+}
